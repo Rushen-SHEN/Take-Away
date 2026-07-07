@@ -115,7 +115,7 @@
     /* ── Insight cards (top-level thesis) ── */
     .thesis-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 1rem;
       max-width: 1200px;
       margin: 2rem auto;
@@ -157,6 +157,58 @@
     .thesis-card.green .label { color: var(--accent); }
     .thesis-card.blue .label { color: var(--quote); }
     .thesis-card.rust .label { color: var(--accent-strong); }
+    .thesis-card.teal::before { background: linear-gradient(90deg, #2f8f80, transparent); }
+    .thesis-card.teal .label { color: #2f8f80; }
+
+    /* Clickable take-away cards -> image lightbox */
+    .thesis-card.tk-card {
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .thesis-card.tk-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px var(--shadow);
+      border-color: var(--border-strong);
+    }
+    .thesis-card .tk-hint {
+      display: inline-block;
+      margin-top: 0.6rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.06em;
+      color: var(--accent-strong);
+      opacity: 0.8;
+    }
+
+    /* Image lightbox / popup */
+    .tk-lightbox {
+      position: fixed; inset: 0; z-index: 100000;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(20,18,16,0.86);
+      -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+      padding: 4vh 3vw;
+    }
+    .tk-lightbox.open { display: flex; }
+    .tk-lightbox img {
+      max-width: 94vw; max-height: 84vh;
+      border-radius: 10px; background: #faf9f5;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+    }
+    .tk-lb-close {
+      position: fixed; top: 18px; right: 22px;
+      width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+      background: rgba(255,255,255,0.94); color: #141413;
+      font-size: 26px; line-height: 42px; text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+    }
+    .tk-lb-cap {
+      position: fixed; left: 0; right: 0; bottom: 20px;
+      text-align: center; color: #faf9f5;
+      font-family: 'Noto Sans SC', system-ui, sans-serif;
+      font-size: 0.85rem; letter-spacing: 0.02em;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+      padding: 0 1rem;
+    }
 
     .thesis-card p {
       font-size: 0.92rem;
@@ -802,25 +854,40 @@
 
 <!-- Top-level thesis cards — Rushen's Takeaways -->
 <div class="thesis-grid">
-  <div class="thesis-card purple">
+  <div class="thesis-card purple tk-card" data-tk-img="takeaway-images/sw3.jpg" data-tk-cap="Rushen's Take-Away #1 · Software 3.0 = 你说需求">
     <div class="label">⚡ Rushen's Take-Away #1</div>
-    <p><strong>Software 3.0 = 你说需求</strong> — Agent 去自动化「可验证」的活动。你从写代码者，变成服务自己需求的产品的 <strong>Co-Creator</strong>。</p>
+    <p><strong>Software 3.0 = 你说需求</strong> — Agent 去自动化「可验证」的活动。你变成服务自己需求的产品的 <strong>Co-Creator</strong>。</p>
+    <p>人人都可以 Cook，但不一定擅长 Cook——总有一部分需求，你愿意外包。</p>
+    <span class="tk-hint">🔍 点击看图</span>
   </div>
-  <div class="thesis-card green">
+  <div class="thesis-card green tk-card" data-tk-img="takeaway-images/jagged.jpg" data-tk-cap="Rushen's Take-Away #2 · AI 的智力是锯齿的（Jagged）">
     <div class="label">🌀 Rushen's Take-Away #2</div>
-    <p><strong>AI 的智力是锯齿的（Jagged）</strong> — 在 Output 可被验证的领域，AI 自动化最快。人类要在能力尖峰上<strong>驾驭，而非竞争</strong>；而一切在某种程度上都能被做成可验证。</p>
+    <p><strong>AI 的智力是锯齿的（Jagged）</strong> — 在 Output 可被验证的领域，AI 自动化最快。人类要在 LLM 的能力尖峰上<strong>驾驭，而非竞争</strong>。</p>
+    <p>而一切工作在某种程度上都能被做成可验证，只是看 LLM 开发者是否注意、或被经济效益吸引去强化训练。</p>
+    <span class="tk-hint">🔍 点击看图</span>
   </div>
-  <div class="thesis-card gold">
+  <div class="thesis-card gold tk-card" data-tk-img="takeaway-images/human.jpg" data-tk-cap="Rushen's Take-Away #3 · Agent 越强，人越要负责">
     <div class="label">📐 Rushen's Take-Away #3</div>
-    <p><strong>Agent 越强，哪种人类技能更值钱？</strong> 当下是<strong>审美、判断、品味、监督</strong>——但这些护城河，将来也可能被放到锯齿上强化训练。</p>
+    <p><strong>Agent 越来越强，哪种人类技能更值钱？</strong> 暂时是<strong>审美、判断、品味、监督</strong>——但这些护城河，将来也可能被放到锯齿上强化训练。</p>
+    <p>你擅长做「总监」、去管理 10–20 个数字员工吗？</p>
+    <span class="tk-hint">🔍 点击看图</span>
   </div>
-  <div class="thesis-card blue">
+  <div class="thesis-card blue tk-card" data-tk-img="takeaway-images/ghosts.jpg" data-tk-cap="Rushen's Take-Away #4 · LLM 是幽灵，不是动物">
     <div class="label">👻 Rushen's Take-Away #4</div>
-    <p><strong>LLM 是幽灵，不是动物</strong> — 没有生物动机，是人类文物的统计模拟。别拟人化，去经验性地摸清它。</p>
+    <p><strong>LLM 是幽灵，不是动物</strong> — 不会害怕、也不抱有好奇心，是人类 artifacts 的统计模拟。别拟人化，去经验性地摸清它。</p>
+    <p>理解它的能力尖峰与脱轨的领域，才能做好数字员工的管理和赋能。</p>
+    <span class="tk-hint">🔍 点击看图</span>
   </div>
-  <div class="thesis-card rust">
+  <div class="thesis-card rust tk-card" data-tk-img="takeaway-images/understanding.jpg" data-tk-cap="Rushen's Take-Away #5 · 理解仍是瓶颈">
     <div class="label">🧭 Rushen's Take-Away #5</div>
-    <p><strong>智能廉价时，什么仍值得深学？</strong>「你可以外包思考，但不能外包理解。」<strong>理解仍是瓶颈</strong>——不理解，就当不好那个「总监」。</p>
+    <p><strong>智能廉价时，什么仍值得深度学习？</strong>「你可以外包思考，但不能外包理解。」</p>
+    <p><strong>理解仍是瓶颈</strong>——不理解，就无法从信息中整理出洞察；没有洞察，就当不好那个「总监」。</p>
+    <span class="tk-hint">🔍 点击看图</span>
+  </div>
+  <div class="thesis-card teal tk-card" data-tk-img="takeaway-images/hitl.jpg" data-tk-cap="Rushen's Take-Away #6 · 机器判对错，人判取舍（Human-in-the-loop）">
+    <div class="label">🔀 Rushen's Take-Away #6</div>
+    <p><strong>如何识别 Human-in-the-loop？</strong>机器做「可验证」的（溯源 / 数字 / 反证 / 格式），人留在 loop 里判「取舍」（主线 / 说服力 / 设计 / 分寸）。<strong>哪些交给数字员工，哪些人来把关。</strong></p>
+    <span class="tk-hint">🔍 点击看图</span>
   </div>
 </div>
 
@@ -1830,5 +1897,43 @@ preserve human understanding</div>
 })();
 </script>
 
+<!-- Take-Away image lightbox -->
+<div class="tk-lightbox" id="tk-lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+  <button class="tk-lb-close" id="tk-lb-close" type="button" contenteditable="false" aria-label="关闭">×</button>
+  <img id="tk-lb-img" src="" alt="">
+  <div class="tk-lb-cap" id="tk-lb-cap"></div>
+</div>
+<script>
+(function(){
+  var lb=document.getElementById('tk-lightbox'),
+      img=document.getElementById('tk-lb-img'),
+      cap=document.getElementById('tk-lb-cap'),
+      closeBtn=document.getElementById('tk-lb-close');
+  function openLb(src, caption){
+    img.alt=caption||''; cap.textContent=caption||'';
+    img.onload=function(){ img.style.display=''; cap.textContent=caption||''; };
+    img.onerror=function(){ img.style.display='none'; cap.textContent=(caption||'')+' · （图片待补充）'; };
+    img.src=src;
+    lb.classList.add('open'); lb.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+  function closeLb(){
+    lb.classList.remove('open'); lb.setAttribute('aria-hidden','true');
+    document.body.style.overflow=''; img.src='';
+  }
+  document.querySelectorAll('.tk-card').forEach(function(card){
+    card.addEventListener('click', function(e){
+      e.preventDefault();
+      var src=card.getAttribute('data-tk-img'); if(!src) return;
+      openLb(src, card.getAttribute('data-tk-cap')||'');
+    });
+  });
+  closeBtn.addEventListener('click', closeLb);
+  lb.addEventListener('click', function(e){ if(e.target===lb) closeLb(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape' && lb.classList.contains('open')) closeLb();
+  });
+})();
+</script>
 </body>
 </html>
