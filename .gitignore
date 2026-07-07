@@ -7,3 +7,4 @@
 # scratch / temp
 *.tmp
 scratch/
+.vercel
