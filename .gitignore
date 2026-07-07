@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# gstack browse daemon state (never commit)
+.gstack/
+
+# scratch / temp
+*.tmp
+scratch/

@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karpathy · Sequoia Ascent 2026 — 双语精读（完整对谈稿）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Claude / Anthropic warm editorial palette */
+      --bg: #faf9f5;
+      --surface: #f5f0e8;
+      --surface-2: #efe9de;
+      --border: #e6dfd8;
+      --border-strong: #d8cfc0;
+      --text: #141413;
+      --text-muted: #575349;
+      --text-soft: #7d7a70;
+      --accent: #b85c3e;
+      --accent-strong: #a44a2d;
+      --accent-dim: rgba(184, 92, 62, 0.12);
+      --insight: #8a5a00;
+      --insight-bg: rgba(154, 103, 0, 0.10);
+      --insight-border: rgba(154, 103, 0, 0.32);
+      --paradigm: #b0512f;
+      --paradigm-bg: rgba(201, 100, 66, 0.11);
+      --paradigm-border: rgba(201, 100, 66, 0.32);
+      --quote: #4f4638;
+      --quote-bg: rgba(92, 83, 71, 0.08);
+      --quote-border: rgba(92, 83, 71, 0.28);
+      --danger: #b23a3a;
+      --danger-bg: rgba(198, 69, 69, 0.10);
+      --shadow: rgba(70, 55, 40, 0.08);
+      --col-en: 1fr;
+      --col-zh: 1fr;
+      --col-terms: 280px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans SC', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      min-height: 100vh;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 4rem 2rem 3rem;
+      text-align: center;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -20%, rgba(204, 120, 92, 0.12), transparent),
+        radial-gradient(ellipse 50% 40% at 80% 100%, rgba(239, 233, 222, 0.9), transparent);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent-dim);
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+    }
+
+    .hero .subtitle {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .hero-meta a {
+      color: var(--quote);
+      text-decoration: none;
+    }
+    .hero-meta a:hover { text-decoration: underline; }
+
+    /* ── Insight cards (top-level thesis) ── */
+    .thesis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .thesis-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .thesis-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .thesis-card.gold::before { background: linear-gradient(90deg, var(--insight), transparent); }
+    .thesis-card.purple::before { background: linear-gradient(90deg, var(--paradigm), transparent); }
+    .thesis-card.green::before { background: linear-gradient(90deg, var(--accent), transparent); }
+    .thesis-card.blue::before { background: linear-gradient(90deg, var(--quote), transparent); }
+    .thesis-card.rust::before { background: linear-gradient(90deg, var(--accent-strong), transparent); }
+
+    .thesis-card .label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .thesis-card.gold .label { color: var(--insight); }
+    .thesis-card.purple .label { color: var(--paradigm); }
+    .thesis-card.green .label { color: var(--accent); }
+    .thesis-card.blue .label { color: var(--quote); }
+    .thesis-card.rust .label { color: var(--accent-strong); }
+
+    .thesis-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    .thesis-card strong { color: var(--text); }
+
+    /* ── Nav ── */
+    .section-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(250, 249, 245, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-strong);
+      box-shadow: 0 1px 8px var(--shadow);
+      padding: 0.6rem 1rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .section-nav a {
+      display: inline-block;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .section-nav a:hover,
+    .section-nav a.active {
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* ── Column headers ── */
+    .col-headers {
+      display: grid;
+      grid-template-columns: var(--col-en) var(--col-zh) var(--col-terms);
+      gap: 0;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem 0.5rem;
+      position: sticky;
+      top: 42px;
+      z-index: 90;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .col-header {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+    }
+
+    .col-header.en { color: var(--quote); }
+    .col-header.zh { color: var(--quote); }
+    .col-header.terms { color: var(--accent-strong); }
+
+    /* ── Main content grid ── */
+    .transcript {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .section-block {
+      margin-top: 2.5rem;
+    }
+
+    .section-title {
+      grid-column: 1 / -1;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      padding: 1rem 0 0.5rem;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: var(--accent-dim);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: var(--col-en) var(--col-zh) var(--col-terms);
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+
+    .row:hover { background: rgba(184, 92, 62, 0.04); }
+
+    .row.insight {
+      background: var(--insight-bg);
+      border-left: 4px solid var(--insight);
+    }
+
+    .row.paradigm {
+      background: var(--paradigm-bg);
+      border-left: 4px solid var(--paradigm);
+    }
+
+    .row.quote {
+      background: var(--quote-bg);
+      border-left: 4px solid var(--quote);
+    }
+
+    .row.contrast {
+      background: var(--danger-bg);
+      border-left: 4px solid var(--danger);
+    }
+
+    /* Emphasis rows keep their tint on hover instead of washing out */
+    .row.insight:hover { background: rgba(154, 103, 0, 0.14); }
+    .row.paradigm:hover { background: rgba(201, 100, 66, 0.15); }
+    .row.quote:hover { background: rgba(92, 83, 71, 0.12); }
+    .row.contrast:hover { background: rgba(198, 69, 69, 0.14); }
+
+    /* Interviewer question rows — read as prompts, visually recessed */
+    .row.question {
+      background: rgba(92, 83, 71, 0.05);
+      border-left: 4px solid var(--border-strong);
+    }
+    .row.question:hover { background: rgba(92, 83, 71, 0.09); }
+    .row.question .cell.en { color: #3d382e; font-style: italic; }
+    .row.question .cell.zh { color: #4a453b; font-style: italic; }
+    .row.question .speaker { color: var(--quote); font-style: normal; }
+
+    .q-tag {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      margin-bottom: 0.4rem;
+      background: rgba(92, 83, 71, 0.1);
+      color: var(--quote);
+      border: 1px solid var(--quote-border);
+      font-weight: 600;
+    }
+
+    /* Rushen's Takeaway — reader's curated highlights layered over the transcript */
+    .row.takeaway {
+      border-left: 5px solid var(--accent-strong);
+      background: rgba(184, 92, 62, 0.08);
+    }
+    .row.takeaway:hover { background: rgba(184, 92, 62, 0.13); }
+
+    .takeaway-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0.18rem 0.5rem;
+      border-radius: 3px;
+      margin-bottom: 0.45rem;
+      margin-right: 0.45rem;
+      background: var(--accent-strong);
+      color: #fff;
+      font-weight: 600;
+      font-style: normal;
+      vertical-align: middle;
+    }
+    .takeaway-badge.hook {
+      background: transparent;
+      color: var(--accent-strong);
+      border: 1px solid var(--accent-strong);
+    }
+
+    .cell {
+      padding: 1.1rem 1rem;
+      font-size: 0.92rem;
+    }
+
+    .cell.en {
+      font-family: 'Source Serif 4', Georgia, serif;
+      color: var(--text);
+      font-size: 0.98rem;
+    }
+
+    .cell.en .speaker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent-strong);
+      display: block;
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+
+    .cell.zh {
+      color: #2b2925;
+      border-left: 1px solid var(--border);
+    }
+
+    .cell.zh .speaker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent-strong);
+      display: block;
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+
+    .cell.terms {
+      border-left: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .term {
+      margin-bottom: 0.85rem;
+    }
+
+    .term:last-child { margin-bottom: 0; }
+
+    .term-word {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .term-ipa {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-left: 0.3rem;
+    }
+
+    .term-def {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+      line-height: 1.5;
+    }
+
+    /* ── Inline highlights ── */
+    .hl-insight {
+      background: linear-gradient(transparent 55%, rgba(216, 165, 45, 0.42) 55%);
+      color: var(--insight);
+      font-weight: 700;
+      padding: 0 0.05em;
+    }
+
+    .hl-paradigm {
+      color: var(--paradigm);
+      font-weight: 600;
+    }
+
+    .hl-danger {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .formula {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin: 0.5rem 0;
+      color: var(--accent);
+      white-space: pre-wrap;
+    }
+
+    .insight-tag {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+    }
+
+    .insight-tag.core { background: var(--insight-bg); color: var(--insight); border: 1px solid var(--insight-border); }
+    .insight-tag.paradigm { background: var(--paradigm-bg); color: var(--paradigm); border: 1px solid var(--paradigm-border); }
+    .insight-tag.quote { background: var(--quote-bg); color: var(--quote); border: 1px solid var(--quote-border); }
+
+    /* ── Software evolution visual ── */
+    .sw-evolution {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .sw-step {
+      flex: 1;
+      min-width: 180px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .sw-step.active {
+      border-color: var(--paradigm);
+      background: var(--paradigm-bg);
+      box-shadow: 0 4px 20px rgba(201, 100, 66, 0.18);
+    }
+
+    .sw-step .ver {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+
+    .sw-step:nth-child(1) .ver { color: var(--text-soft); }
+    .sw-step:nth-child(2) .ver { color: var(--accent); }
+    .sw-step:nth-child(3) .ver { color: var(--paradigm); }
+
+    .sw-step .desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .sw-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+    }
+
+    /* ── Jagged chart ── */
+    .jagged-viz {
+      grid-column: 1 / -1;
+      padding: 1rem;
+    }
+
+    .jagged-bar-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.4rem;
+      height: 120px;
+      padding: 0 0.5rem;
+    }
+
+    .jagged-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      min-width: 40px;
+    }
+
+    .jagged-bar .bar-label {
+      position: absolute;
+      bottom: -1.6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .jagged-bar .bar-val {
+      position: absolute;
+      top: -1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    footer a { color: var(--quote); }
+
+    @media (max-width: 960px) {
+      :root {
+        --col-en: 1fr;
+        --col-zh: 1fr;
+        --col-terms: 1fr;
+      }
+
+      .col-headers { display: none; }
+
+      .row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .cell.zh, .cell.terms {
+        border-left: none;
+        border-top: 1px dashed var(--border);
+      }
+
+      .cell.terms::before {
+        content: '术语';
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .cell.zh::before {
+        content: '中文';
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--quote);
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .sw-arrow { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-badge">Sequoia Ascent 2026 · Fireside Chat</div>
+  <h1>From Vibe Coding to Agentic Engineering</h1>
+  <p class="subtitle">Andrej Karpathy 与 Stephanie Zhan 完整对谈 — 软件 3.0、锯齿状智能与 Agent 时代的编程范式</p>
+  <div class="hero-meta">
+    <span>🎬 <a href="https://www.youtube.com/watch?v=96jN2OCOfLs" target="_blank">YouTube 原视频</a></span>
+    <span>📝 <a href="https://karpathy.bearblog.dev/sequoia-ascent-2026/" target="_blank">Karpathy 官方清理稿</a></span>
+    <span>⏱ 完整对谈 · ~30 min</span>
+  </div>
+</header>
+
+<!-- Top-level thesis cards — Rushen's Takeaways -->
+<div class="thesis-grid">
+  <div class="thesis-card purple">
+    <div class="label">⚡ Rushen's Take-Away #1</div>
+    <p><strong>Software 3.0 = 你说需求</strong> — Agent 去自动化「可验证」的活动。你从写代码者，变成服务自己需求的产品的 <strong>Co-Creator</strong>。</p>
+  </div>
+  <div class="thesis-card green">
+    <div class="label">🌀 Rushen's Take-Away #2</div>
+    <p><strong>AI 的智力是锯齿的（Jagged）</strong> — 在 Output 可被验证的领域，AI 自动化最快。人类要在能力尖峰上<strong>驾驭，而非竞争</strong>；而一切在某种程度上都能被做成可验证。</p>
+  </div>
+  <div class="thesis-card gold">
+    <div class="label">📐 Rushen's Take-Away #3</div>
+    <p><strong>Agent 越强，哪种人类技能更值钱？</strong> 当下是<strong>审美、判断、品味、监督</strong>——但这些护城河，将来也可能被放到锯齿上强化训练。</p>
+  </div>
+  <div class="thesis-card blue">
+    <div class="label">👻 Rushen's Take-Away #4</div>
+    <p><strong>LLM 是幽灵，不是动物</strong> — 没有生物动机，是人类文物的统计模拟。别拟人化，去经验性地摸清它。</p>
+  </div>
+  <div class="thesis-card rust">
+    <div class="label">🧭 Rushen's Take-Away #5</div>
+    <p><strong>智能廉价时，什么仍值得深学？</strong>「你可以外包思考，但不能外包理解。」<strong>理解仍是瓶颈</strong>——不理解，就当不好那个「总监」。</p>
+  </div>
+</div>
+
+
+<nav class="section-nav" id="nav">
+  <a href="#s-intro">开场</a>
+  <a href="#s-dec">12月拐点</a>
+  <a href="#s-sw3">Software 3.0</a>
+  <a href="#s-neural">神经计算机</a>
+  <a href="#s-verify">可验证性 · 锯齿智能</a>
+  <a href="#s-startup">创业机会</a>
+  <a href="#s-vibe">Vibe vs Agentic</a>
+  <a href="#s-native">AI 原生编码</a>
+  <a href="#s-human">人类技能</a>
+  <a href="#s-ghost">Ghosts</a>
+  <a href="#s-infra">Agent 基础设施</a>
+  <a href="#s-edu">教育</a>
+  <a href="#s-big">全景总结</a>
+</nav>
+
+<div class="col-headers">
+  <div class="col-header en">English · Original</div>
+  <div class="col-header zh">中文 · 对照翻译</div>
+  <div class="col-header terms">AI 术语 · 发音 & 释义</div>
+</div>
+
+<main class="transcript">
+
+<!-- ═══ INTRO ═══ -->
+<div class="section-block" id="s-intro">
+  <div class="section-title"><span class="section-num">00</span> Introduction · 开场</div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Host · Intro</span>
+      <span class="speaker">Konstantine</span>
+      Someone you all know, someone who has become, in this AI revolution, a teacher of AI. In every revolution there is the technologist, but there is also the teacher — the person who actually informs and instructs how this transformation is going to happen. Andrej has become that teacher to the world. Early at Autopilot at Tesla, co-founder of OpenAI, he left it all to start Eureka Labs, where he leaned into the idea of an AI that was a true instructor. We're happy to have Andrej Karpathy with our partner Stephanie Zhan.
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">主持 · 引言</span>
+      <span class="speaker">Konstantine</span>
+      这个人你们都认识。在这场 AI 革命里，他已经成为一位 AI 的老师。每一场革命里都有技术专家，但也有老师——那个真正去讲解、去指导这场变革将如何发生的人。Andrej 已经成为世界的这位老师。早年在特斯拉做 Autopilot、OpenAI 联合创始人，他放下这一切去创办 Eureka Labs，专注于「让 AI 成为真正的导师」这个想法。很高兴请到 Andrej Karpathy，与我们的合伙人 Stephanie Zhan 对谈。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">Autopilot</span><span class="term-ipa">/ˈɔːtoʊpaɪlət/</span><div class="term-def">特斯拉自动驾驶系统；Karpathy 曾任其 AI 负责人</div></div>
+      <div class="term"><span class="term-word">Eureka Labs</span><span class="term-ipa">/juˈriːkə læbz/</span><div class="term-def">Karpathy 创办的「AI 原生」教育公司</div></div>
+    </div>
+  </div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Interviewer · Opening</span>
+      <span class="speaker">Stephanie Zhan</span>
+      Hi everyone. We're excited for our first special guest. He has helped build modern AI, explain modern AI, and occasionally rename modern AI. He helped co-found OpenAI. He helped get Autopilot working at Tesla. And he has a rare gift for making the most complex technical shifts feel both accessible and inevitable. You all know him for having coined the term <em>vibe coding</em> last year. But just in the last few months, he said something even more startling: <span class="hl-insight">he has never felt more behind as a programmer.</span> That's where we're starting today. Thank you, Andrej, for joining us.
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问 · 开场</span>
+      <span class="speaker">Stephanie Zhan</span>
+      大家好。我们很期待第一位特别嘉宾。他参与构建了现代 AI、解释了现代 AI，偶尔还给现代 AI 改名字。他参与联合创办 OpenAI，让特斯拉的 Autopilot 跑起来。他有一种罕见的天赋：能把最复杂的技术转变讲得既好懂、又像是必然。你们都知道他去年造了「<em>vibe coding</em>（氛围编程）」这个词。但就在最近几个月，他说了一句更令人震惊的话：<span class="hl-insight">他从未像现在这样，感到自己作为程序员如此落后。</span>今天我们就从这里开始。谢谢你，Andrej。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">vibe coding</span><span class="term-ipa">/vaɪb ˈkoʊdɪŋ/</span><div class="term-def">氛围编程：凭直觉描述需求，信任 AI 生成代码，极少手动干预的编程方式</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej Karpathy</span>Hello. Excited to be here and to kick us off.</div>
+    <div class="cell zh"><span class="speaker">Andrej Karpathy</span>大家好。很高兴来到这里，我们开始吧。</div>
+    <div class="cell terms"></div>
+  </div>
+</div>
+
+<!-- ═══ DECEMBER INFLECTION ═══ -->
+<div class="section-block" id="s-dec">
+  <div class="section-title"><span class="section-num">01</span> The December 2025 Agentic Inflection · 2025 年 12 月的 Agentic 拐点</div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      A couple of months ago, you said you've never felt more behind as a programmer. That's startling to hear from you, of all people. Can you help us unpack that? Was that feeling exhilarating or unsettling?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      几个月前你说，你从未像现在这样感到作为程序员如此落后。从你口中说出这话尤其令人震惊。能帮我们拆解一下吗？这种感觉是令人振奋，还是令人不安？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>A mixture of both, for sure. Like many of you, I've been using agentic tools like Claude Code, Codex, and adjacent things for a while — maybe over the last year. They were very good at chunks of code, but sometimes they would mess up and you had to edit them. They were helpful.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>肯定是两者兼有。和你们很多人一样，我用 Claude Code、Codex 这类 Agent 工具已经有一段时间了，大概超过一年。它们很擅长写一段段代码，但有时会搞砸，你得去改。总体是有帮助的。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">agentic</span><span class="term-ipa">/əˈdʒɛntɪk/</span><div class="term-def">代理式的：AI 能自主规划、调用工具、执行多步任务的特性</div></div>
+      <div class="term"><span class="term-word">chunk</span><span class="term-ipa">/tʃʌŋk/</span><div class="term-def">代码块：一次生成的一整段代码</div></div>
+    </div>
+  </div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Core Insight</span>
+      <span class="speaker">Andrej</span>
+      Then I would say December was a clear point. I was on a break, so I had more time. I started to notice that with the latest models, the chunks just came out fine. Then I kept asking for more and they still came out fine. <span class="hl-insight">I couldn't remember the last time I corrected it.</span> I started trusting the system more and more.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      <span class="speaker">Andrej</span>
+      然后我得说，12 月是个明确的转折点。我在休假，时间更多。我开始注意到，用最新的模型，生成的代码块就是对的。我不断要更多，结果还是对的。<span class="hl-insight">我记不起上一次去纠正它是什么时候了。</span>我开始越来越信任这个系统。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">step change</span><span class="term-ipa">/stɛp tʃeɪndʒ/</span><div class="term-def">阶跃变化：非线性、突变式的进步，而非渐进改善</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>I do think it was a stark transition. A lot of people experienced AI last year as a ChatGPT-adjacent thing, but you really had to look again as of December, because things changed fundamentally — especially in this agentic, coherent workflow. It really started to work.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>我确实觉得这是个鲜明的转变。很多人去年把 AI 体验成「ChatGPT 那类东西」，但到了 12 月你真的得重新审视，因为有些东西发生了根本变化——尤其是在这种代理式、连贯的工作流里。它真的开始奏效了。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">coherent</span><span class="term-ipa">/koʊˈhɪrənt/</span><div class="term-def">连贯的：逻辑自洽、结构完整的</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>That realization sent me down the rabbit hole of infinite side projects. My side-projects folder is extremely full with random things. I was coding all the time. That happened in December, and I've been looking at the repercussions since.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>这个领悟把我带进了无穷无尽的副业项目的兔子洞。我的「side-projects」文件夹塞满了各种随手做的东西。我一直在写代码。这都发生在 12 月，之后我一直在观察它带来的连锁反应。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">rabbit hole</span><span class="term-ipa">/ˈræbɪt hoʊl/</span><div class="term-def">兔子洞：让人越钻越深、欲罢不能的探索过程</div></div>
+      <div class="term"><span class="term-word">repercussion</span><span class="term-ipa">/ˌriːpərˈkʌʃən/</span><div class="term-def">连锁反应：某个变化带来的后续影响</div></div>
+    </div>
+  </div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Core Insight</span>
+      The <span class="hl-insight">unit of programming changed</span> from typing lines of code to delegating larger "macro actions": Implement this feature. Refactor this subsystem. Research this library. Set up this service. Write tests, run them, and fix failures. Compare approaches and propose a plan. The programmer is increasingly not just a code writer, but an <span class="hl-insight">orchestrator of agents</span>.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      <span class="hl-insight">编程的基本单元变了</span>——从敲代码行，变成委派更大的「宏观动作」：实现这个功能、重构这个子系统、调研这个库、搭建这个服务、写测试并运行修复、比较方案并提出计划。程序员越来越不只是代码编写者，而是 <span class="hl-insight">Agent 的编排者</span>。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">macro action</span><span class="term-ipa">/ˈmækroʊ ˈækʃən/</span><div class="term-def">宏观动作：Agent 层面的一次高层指令，内含多个子步骤</div></div>
+      <div class="term"><span class="term-word">orchestrator</span><span class="term-ipa">/ˈɔːrkɪstreɪtər/</span><div class="term-def">编排者：协调多个 Agent 完成复杂任务的角色</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SOFTWARE 3.0 ═══ -->
+<div class="section-block" id="s-sw3">
+  <div class="section-title"><span class="section-num">02</span> Software 3.0 · 软件 3.0 范式</div>
+
+  <div class="row question takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge hook">★ Rushen's Take-Away 1</span><span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      You've talked about LLMs as a new computer. It isn't just better software; it's a new computing paradigm. Software 1.0 was explicit rules. Software 2.0 was learned weights. Software 3.0 is this. If that is true, what does a team build differently the day they actually believe it?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      你说过 LLM 是一种新计算机。它不只是更好的软件，而是一种全新的计算范式。Software 1.0 是显式规则，Software 2.0 是学习得到的权重，Software 3.0 就是现在这个。如果这是真的，一个团队在真正相信它的那一天，会开始做哪些不一样的事？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <!-- Visual: Software evolution -->
+  <div class="sw-evolution">
+    <div class="sw-step">
+      <div class="ver">Software 1.0</div>
+      <div class="desc">Humans write explicit code<br>人类写显式代码</div>
+    </div>
+    <div class="sw-arrow">→</div>
+    <div class="sw-step">
+      <div class="ver">Software 2.0</div>
+      <div class="desc">Datasets + neural nets<br>数据集 + 神经网络</div>
+    </div>
+    <div class="sw-arrow">→</div>
+    <div class="sw-step active">
+      <div class="ver">Software 3.0</div>
+      <div class="desc">Prompts + context + tools<br>提示词 + 上下文 + 工具</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>Software 1.0 is writing code. Software 2.0 is programming by creating datasets and training neural networks — programming becomes arranging datasets, objectives, and architectures. Then, if you train LLMs on a sufficiently large set of tasks — and the internet contains many tasks — these models become programmable computers in a certain sense.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>Software 1.0 是写代码。Software 2.0 是通过创建数据集、训练神经网络来编程——编程变成了安排数据集、目标函数和网络架构。接着，如果你在足够多的任务上训练 LLM——而互联网本身就包含大量任务——这些模型在某种意义上就变成了「可编程的计算机」。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">weights</span><span class="term-ipa">/weɪts/</span><div class="term-def">权重：神经网络中通过训练学到的参数，Software 2.0 的「程序」</div></div>
+      <div class="term"><span class="term-word">objective</span><span class="term-ipa">/əbˈdʒɛktɪv/</span><div class="term-def">目标函数：训练时优化的数学目标</div></div>
+    </div>
+  </div>
+
+  <div class="row paradigm takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge">★ Rushen's Take-Away 1</span><span class="insight-tag paradigm">Paradigm Shift</span>
+      <span class="speaker">Andrej</span>
+      Software 3.0 is about programming through prompting. <span class="hl-paradigm">What's in the context window is your lever over the interpreter, and the interpreter is the LLM.</span> It interprets your context and performs computation in digital information space.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag paradigm">范式转移</span>
+      <span class="speaker">Andrej</span>
+      Software 3.0 是通过「提示」来编程。<span class="hl-paradigm">Context Window（上下文窗口）里的内容，就是你操纵解释器的杠杆，而解释器就是 LLM。</span>它解释你的上下文，在数字信息空间中执行计算。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">context window</span><span class="term-ipa">/ˈkɒntekst ˈwɪndoʊ/</span><div class="term-def">上下文窗口：LLM 一次能「看到」和处理的最大 token 量，即程序的「内存空间」</div></div>
+      <div class="term"><span class="term-word">interpreter</span><span class="term-ipa">/ɪnˈtɜːrprɪtər/</span><div class="term-def">解释器：逐行/逐段读取并执行指令的程序；此处 LLM 即新解释器</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>A few examples drove this home. When OpenClaw came out, to install it you would normally expect a shell script. But to target many platforms, shell scripts balloon and become extremely complex — you're stuck in the Software 1.0 universe of wanting to write exact code. The OpenClaw install was instead a block of text you copy-paste into your agent. It's like a little skill: copy this, give it to your agent, and it installs OpenClaw. The agent looks at your environment, performs intelligent actions, and debugs in the loop.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>有几个例子让我彻底理解了这点。OpenClaw 出来时，装它你通常会预期一个 shell 脚本。但要适配许多平台，shell 脚本会膨胀、变得极其复杂——你被困在 Software 1.0 那种「想把每一步写死」的世界里。而 OpenClaw 的安装方式是一段文本，你复制粘贴给你的 Agent。它就像一个小小的 skill：复制这个、交给 Agent，它就把 OpenClaw 装好了。Agent 会查看你的环境、执行智能动作、在循环中调试。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">brittle</span><span class="term-ipa">/ˈbrɪtl/</span><div class="term-def">脆弱的：容易因边界情况而崩溃的</div></div>
+      <div class="term"><span class="term-word">OpenClaw</span><span class="term-ipa">/ˈoʊpən klɔː/</span><div class="term-def">开源 Agent 编码工具，其「复制粘贴给 Agent」的安装方式成为 Software 3.0 的标志案例</div></div>
+    </div>
+  </div>
+
+  <div class="row paradigm">
+    <div class="cell en">
+      <span class="insight-tag paradigm">Paradigm Shift</span>
+      That is a different way of thinking. <span class="hl-paradigm">What is the piece of text to copy-paste into your agent?</span> That is now part of the programming paradigm. It is less precise, but more adaptive.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag paradigm">范式转移</span>
+      这是一种不同的思维方式。<span class="hl-paradigm">「该复制粘贴什么文本给 Agent？」</span>——这现在成了编程范式的一部分。它精度更低，但适应性更强。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">adaptive</span><span class="term-ipa">/əˈdæptɪv/</span><div class="term-def">自适应的：能根据环境变化动态调整的</div></div>
+      <div class="term"><span class="term-word">skill</span><span class="term-ipa">/skɪl/</span><div class="term-def">技能包：一段可复用、粘贴给 Agent 的指令</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>Another example is MenuGen. You sit down at a restaurant, get a menu with no pictures — I don't know what many of these dishes are. I wanted a photo of the menu to give me pictures of what those dishes might look like. So I built an app: you upload a photo, it OCRs all the titles, uses an image generator, and shows them to you. It runs on Vercel and rerenders the menu.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>另一个例子是 MenuGen。你坐在餐厅，拿到一份没有图片的菜单——很多菜我根本不知道是什么。我想拍张菜单照片，让它给我这些菜大概长什么样的图片。于是我做了个 App：你上传照片，它 OCR 出所有菜名，用图像生成器出图，再展示给你。它跑在 Vercel 上，重新渲染菜单。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">OCR</span><span class="term-ipa">/ˌoʊ siː ˈɑːr/</span><div class="term-def">光学字符识别：从图像中提取文字的技术</div></div>
+      <div class="term"><span class="term-word">Vercel</span><span class="term-ipa">/vɜːrˈsɛl/</span><div class="term-def">前端应用部署平台</div></div>
+    </div>
+  </div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Core Insight</span>
+      Then I saw the Software 3.0 version, which blew my mind. You take the photo, give it to Gemini, and say: use Nano Banana to overlay the dishes onto the menu. It returns an image of the menu I took, but with pictures rendered into the pixels. <span class="hl-insight">All of MenuGen is spurious in that framing. That app shouldn't exist.</span> Your prompt is the image, the output is an image — no need for all the app machinery in between.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      后来我看到了 Software 3.0 版本，令我震撼。你拍照片，交给 Gemini，说：用 Nano Banana 把菜品图叠加到菜单上。它返回的是我拍的那张菜单，但菜品图片已经渲染进了像素里。<span class="hl-insight">在这个框架下，整个 MenuGen 都是多余的。那个 App 不该存在。</span>你的提示就是那张图，输出也是一张图——中间那一整套 App 机器根本不需要。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">multimodal</span><span class="term-ipa">/ˌmʌltiˈmoʊdl/</span><div class="term-def">多模态：能同时处理文本、图像、音频等多种输入类型的模型</div></div>
+      <div class="term"><span class="term-word">Nano Banana</span><span class="term-ipa">/ˈnænoʊ bəˈnænə/</span><div class="term-def">Gemini 的图像生成/编辑能力代号，可 overlay 渲染到原图</div></div>
+      <div class="term"><span class="term-word">spurious</span><span class="term-ipa">/ˈspjʊriəs/</span><div class="term-def">多余/虚假的：本不必要、可被省去的</div></div>
+    </div>
+  </div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Core Insight</span>
+      People have to reframe. <span class="hl-insight">Don't only work in the existing paradigm and think of AI as a speedup of what exists. New things are available now.</span> This is more general information processing that is now automatable. With my LLM knowledge bases project, you get LLMs to create wikis for your org or yourself — take messy documents, recompile them, reorder them, create something new. No classical program could do that. I keep coming back to: not only what can we do faster, but what couldn't be possible before?
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      人们必须重新框定问题。<span class="hl-insight">不要只在现有范式里工作，把 AI 当成对已有事物的加速。全新的东西现在就已经可用了。</span>这是一种更普遍的信息处理，现在变得可自动化了。以我的 LLM 知识库项目为例：让 LLM 为你的组织或你个人建 wiki——把杂乱的文档拿来，重新编译、重新排序，创造出新东西。经典程序做不到这一点。我不断回到这个问题：不只是「能更快做什么」，而是「以前根本不可能、现在却很自然的是什么」？
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">reframe</span><span class="term-ipa">/riːˈfreɪm/</span><div class="term-def">重新框定：换一套框架去看待问题</div></div>
+      <div class="term"><span class="term-word">knowledge base</span><span class="term-ipa">/ˈnɒlɪdʒ beɪs/</span><div class="term-def">知识库：把原始资料结构化沉淀、可查询的信息集合</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NEURAL COMPUTERS ═══ -->
+<div class="section-block" id="s-neural">
+  <div class="section-title"><span class="section-num">03</span> Neural Computers · 神经计算机</div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      I love the MenuGen progression. If you extrapolate further, what is the 2026 equivalent of building websites in the 90s, mobile apps in the 2010s, or SaaS in the cloud era? What will look obvious in hindsight that is still mostly unbuilt today?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      我很喜欢 MenuGen 这个演进。如果再往前外推，2026 年的对应物会是什么——就像 90 年代建网站、2010 年代做手机 App、云时代做 SaaS 那样？有什么事回头看会觉得理所当然、但今天还基本没人建出来？
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">extrapolate</span><span class="term-ipa">/ɪkˈstræpəleɪt/</span><div class="term-def">外推：从已知趋势推断更远的未来形态</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>Going with the MenuGen example, a lot of this code shouldn't exist. The neural network should be doing most of the work.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>顺着 MenuGen 的例子讲，很多这类代码根本不该存在。大部分工作应该由神经网络来做。</div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row paradigm">
+    <div class="cell en">
+      <span class="insight-tag paradigm">Paradigm Shift</span>
+      The extrapolation looks very weird. You could imagine <span class="hl-paradigm">completely neural computers</span> — a device that takes raw video or audio into a neural net and uses diffusion to render a UI unique for that moment.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag paradigm">范式转移</span>
+      这个外推看起来非常怪异。你可以设想<span class="hl-paradigm">完全的「神经计算机」</span>——一个设备，把原始视频或音频喂进神经网络，用扩散模型即时渲染出一个专为此刻定制的 UI。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">diffusion</span><span class="term-ipa">/dɪˈfjuːʒən/</span><div class="term-def">扩散模型：主流的图像/视频生成方法，从噪声逐步去噪成图</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>In the early days of computing, people were a little confused about whether computers would look like calculators or neural nets. In the 1950s and 60s it was not obvious which way it would go. We went down the calculator path and built classical computing.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>在计算的早期，人们其实有点搞不清计算机会长得像「计算器」还是像「神经网络」。在 1950、60 年代，走哪条路并不明显。我们最终走了计算器那条路，建起了经典计算。</div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row paradigm">
+    <div class="cell en">
+      <span class="insight-tag paradigm">Paradigm Shift</span>
+      Neural nets currently run virtualized on existing computers. But you can imagine a flip where <span class="hl-paradigm">the neural net becomes the host process and CPUs become coprocessors</span> — intelligence compute becomes the dominant spend of FLOPs, and tools are a historical appendage for deterministic tasks. We'll get there piece by piece.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag paradigm">范式转移</span>
+      神经网络目前是虚拟化地跑在现有计算机上的。但你可以设想一次「翻转」：<span class="hl-paradigm">神经网络成为宿主进程，而 CPU 变成协处理器</span>——智能计算成为 FLOPs 的主要开销，工具只是留给确定性任务的「历史遗留附件」。我们会一块一块地走到那里。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">host process</span><span class="term-ipa">/hoʊst ˈprɒsɛs/</span><div class="term-def">宿主进程：掌控全局、调度其他部件的主程序</div></div>
+      <div class="term"><span class="term-word">coprocessor</span><span class="term-ipa">/ˈkoʊprɒsɛsər/</span><div class="term-def">协处理器：辅助主处理器、承担特定计算的部件</div></div>
+      <div class="term"><span class="term-word">FLOPs</span><span class="term-ipa">/flɒps/</span><div class="term-def">每秒浮点运算次数：衡量算力的单位</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VERIFIABILITY & JAGGED ═══ -->
+<div class="section-block" id="s-verify">
+  <div class="section-title"><span class="section-num">04</span> Verifiability &amp; Jagged Intelligence · 可验证性与锯齿状智能</div>
+
+  <div class="row question takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge hook">★ Rushen's Take-Away 2</span><span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      I'd love to talk about verifiability — the idea that AI automates faster in domains where the output can be verified. If that framework is right, what work is about to move much faster than people realize? And what professions do people think are safe, but are actually highly verifiable?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      我很想聊聊「可验证性」——也就是「在输出可被验证的领域，AI 会更快地自动化」这个想法。如果这个框架成立，哪些工作即将以超出人们预期的速度加速？又有哪些职业，人们以为很安全、实际上却高度可验证？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row insight takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge">★ Rushen's Take-Away 2</span><span class="insight-tag core">Core Insight</span>
+      <span class="speaker">Andrej</span>
+      Traditional computers automate what you can <strong>specify</strong> in code. This latest round of LLMs can automate what you can <strong>verify</strong>. When frontier labs train these LLMs in giant reinforcement learning environments with verification rewards, the models become jagged entities: they peak in verifiable domains like math and code, and stay rough where things are not in that space.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      <span class="speaker">Andrej</span>
+      传统计算机自动化「你能在代码中<strong>指定</strong>的东西」。而这一轮 LLM 能自动化「你能<strong>验证</strong>的东西」。当前沿实验室在巨大的、带验证奖励的强化学习环境里训练这些 LLM 时，模型就变成了「锯齿状」的存在：它们在数学、代码这类可验证领域达到顶峰，而在不属于这个空间的地方仍然粗糙。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">verifiability</span><span class="term-ipa">/ˌverɪfaɪəˈbɪlɪti/</span><div class="term-def">可验证性：任务结果能否被自动检验对错的属性</div></div>
+      <div class="term"><span class="term-word">specify</span><span class="term-ipa">/ˈspesɪfaɪ/</span><div class="term-def">指定：用精确规则描述每一步操作</div></div>
+      <div class="term"><span class="term-word">reinforcement learning</span><span class="term-ipa">/ˌriːɪnˈfɔːrsmənt ˈlɜːrnɪŋ/</span><div class="term-def">强化学习 (RL)：通过奖励信号训练模型优化策略</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>Some of the jaggedness is about how labs train the models; some is about what labs focus on and put into the data distribution. Some things are far more valuable economically, so labs create more environments for them. Code is a good example. There are many verifiable environments that never made it into the mix because they're not as economically useful.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>锯齿状一部分来自实验室怎么训练模型；一部分来自实验室关注什么、把什么放进了数据分布。有些东西在经济上价值高得多，所以实验室为它们造了更多环境。代码就是个好例子。还有很多可验证的环境从没进入过训练配比，只是因为它们在经济上没那么有用。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">data distribution</span><span class="term-ipa">/ˈdeɪtə ˌdɪstrɪˈbjuːʃən/</span><div class="term-def">数据分布：训练数据在各领域上的构成与占比</div></div>
+    </div>
+  </div>
+
+  <div class="row paradigm">
+    <div class="cell en" style="grid-column: 1 / 3;">
+      <div class="formula">capability spike ≈ verifiability × training attention × data coverage × economic value</div>
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">capability spike</span><span class="term-ipa">/ˌkeɪpəˈbɪlɪti spaɪk/</span><div class="term-def">能力尖峰：模型在特定领域突然表现极好的现象</div></div>
+      <div class="term"><span class="term-word">data coverage</span><span class="term-ipa">/ˈdeɪtə ˈkʌvərɪdʒ/</span><div class="term-def">数据覆盖度：训练数据中该领域的占比</div></div>
+    </div>
+  </div>
+
+  <!-- Jagged visualization -->
+  <div class="jagged-viz">
+    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Model capability spikes — 模型能力尖峰分布（示意）</p>
+    <div class="jagged-bar-wrap">
+      <div class="jagged-bar" style="height:95%;background:linear-gradient(to top,#6ee7b7,#34d399);">
+        <span class="bar-val" style="color:var(--accent);">95%</span>
+        <span class="bar-label">Code<br>编程</span>
+      </div>
+      <div class="jagged-bar" style="height:90%;background:linear-gradient(to top,#60a5fa,#3b82f6);">
+        <span class="bar-val" style="color:#2f6fd0;">90%</span>
+        <span class="bar-label">Math<br>数学</span>
+      </div>
+      <div class="jagged-bar" style="height:85%;background:linear-gradient(to top,#a78bfa,#8b5cf6);">
+        <span class="bar-val" style="color:var(--paradigm);">85%</span>
+        <span class="bar-label">Chess<br>象棋</span>
+      </div>
+      <div class="jagged-bar" style="height:70%;background:linear-gradient(to top,#94a3b8,#64748b);">
+        <span class="bar-val" style="color:#5b6675;">70%</span>
+        <span class="bar-label">Writing<br>写作</span>
+      </div>
+      <div class="jagged-bar" style="height:25%;background:linear-gradient(to top,#f87171,#ef4444);">
+        <span class="bar-val" style="color:var(--danger);">25%</span>
+        <span class="bar-label">Common<br>Sense<br>常识</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row contrast">
+    <div class="cell en">
+      <span class="insight-tag core">Counter-intuitive</span>
+      One favorite example: models famously got "how many letters in strawberry?" wrong — now patched. The newer one: I want to go to a car wash 50 meters away — should I drive or walk? State-of-the-art models may tell you to walk. How is it possible that a model can <span class="hl-danger">refactor a 100,000-line codebase</span> or find zero-day vulnerabilities, yet tells me to <span class="hl-danger">walk to a car wash 50 meters away</span>? That's jaggedness — <span class="hl-insight">you need to stay in the loop</span>.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">反直觉</span>
+      一个我很喜欢的例子：模型曾经在「strawberry 有几个字母？」上出名地答错——现在已被修补。更新的例子是：我想去 50 米外的洗车店洗车，该开车还是走路？最先进的模型可能会告诉你走路。一个模型能<span class="hl-danger">重构 10 万行代码库</span>、能找零日漏洞，却告诉你<span class="hl-danger">步行 50 米去洗车</span>——这怎么可能？这就是锯齿状。只要它还锯齿，<span class="hl-insight">你就必须留在回路里</span>。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">jagged</span><span class="term-ipa">/ˈdʒæɡɪd/</span><div class="term-def">锯齿状的：能力分布极不均匀，某些领域极强、某些极弱</div></div>
+      <div class="term"><span class="term-word">zero-day</span><span class="term-ipa">/ˈzɪroʊ deɪ/</span><div class="term-def">零日漏洞：尚未公开或修补的安全漏洞</div></div>
+      <div class="term"><span class="term-word">state-of-the-art</span><span class="term-ipa">/ˌsteɪt əv ði ˈɑːrt/</span><div class="term-def">SOTA：当前最高水平</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>Another anecdote is chess. From GPT-3.5 to GPT-4, chess improved a lot. Some thought it was general capability progress. But it's public that a large amount of chess data made it into the pretraining set. Because it was in the distribution, the model improved much more than it would by default. Someone at OpenAI decided to add that data, and now there's a capability spike.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>还有个关于象棋的轶事。从 GPT-3.5 到 GPT-4，象棋能力提升了很多。有人以为这是通用能力的进步。但公开信息显示，大量象棋数据进入了预训练集。正因为它在数据分布里，模型的提升远超默认情况。OpenAI 有人决定加入这些数据，于是就出现了一个能力尖峰。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">pretraining mix</span><span class="term-ipa">/priːˈtreɪnɪŋ mɪks/</span><div class="term-def">预训练混合：预训练阶段使用的多源数据配比</div></div>
+      <div class="term"><span class="term-word">anecdote</span><span class="term-ipa">/ˈænɪkdoʊt/</span><div class="term-def">轶事：具体的小故事/例子</div></div>
+    </div>
+  </div>
+
+  <div class="row insight takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge">★ Rushen's Take-Away 2</span><span class="insight-tag core">Core Insight</span>
+      We are slightly at the mercy of what the labs put into the mix. The model comes with <span class="hl-insight">no manual</span>. If you're in the circuits that were part of reinforcement learning, you fly; if you're outside the distribution, you struggle. The practical question for a founder is: <span class="hl-insight">are you on the model's rails?</span> If not, you may need better context, tools, fine-tuning, or your own RL environment.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      我们在某种程度上受制于实验室往训练里放了什么。模型是<span class="hl-insight">没有说明书</span>的。如果你落在被强化学习覆盖过的「电路」里，你就一飞冲天；如果你在数据分布之外，就举步维艰。对创业者而言，实际的问题是：<span class="hl-insight">你在模型的「轨道」上吗？</span>如果不在，你可能需要更好的上下文、工具、微调，或是你自己的 RL 环境。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">on the rails</span><span class="term-ipa">/ɒn ðə reɪlz/</span><div class="term-def">在轨道上：任务落在模型被重点训练/验证过的能力域内</div></div>
+      <div class="term"><span class="term-word">fine-tuning</span><span class="term-ipa">/faɪn ˈtjuːnɪŋ/</span><div class="term-def">微调：在预训练模型上用特定数据继续训练以适配任务</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STARTUP OPPORTUNITIES ═══ -->
+<div class="section-block" id="s-startup">
+  <div class="section-title"><span class="section-num">05</span> Startup Opportunities in Verifiable Domains · 可验证领域的创业机会</div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      If you were a founder today solving a tractable, verifiable problem, but you saw the labs reaching escape velocity in obvious domains like math and coding, what would your advice be?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      如果你今天是一位创业者，在解决一个可处理、可验证的问题，但你环顾四周，看到实验室已经在数学、编程这些明显领域逼近「逃逸速度」，你会给什么建议？
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">tractable</span><span class="term-ipa">/ˈtræktəbl/</span><div class="term-def">可处理的：在当前方法下能被有效攻克的</div></div>
+      <div class="term"><span class="term-word">escape velocity</span><span class="term-ipa">/ɪˈskeɪp vəˈlɒsɪti/</span><div class="term-def">逃逸速度：此处喻指能力已自我加速、别人难以追赶</div></div>
+    </div>
+  </div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Core Insight</span>
+      <span class="speaker">Andrej</span>
+      Verifiability makes something tractable because you can throw a huge amount of RL at it — and that remains true even if the labs aren't focusing on it. <span class="hl-insight">If you're in a verifiable setting where you can create RL environments or examples, you can do your own fine-tuning and benefit.</span> That technology fundamentally works. There are valuable RL environments people could think of that are not part of the current frontier-lab mix. That is a startup wedge.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      <span class="speaker">Andrej</span>
+      可验证性让一件事变得可处理，因为你可以往上砸海量强化学习——即使实验室没在关注它，这一点依然成立。<span class="hl-insight">如果你处在一个可验证的场景、能造出 RL 环境或样例，你就能做自己的微调并从中获益。</span>这项技术在根本上是有效的。有很多有价值的 RL 环境，是当前前沿实验室配比里没有的。那就是创业的切入楔子。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">RL environment</span><span class="term-ipa">/ɑːr ɛl ɪnˈvaɪrənmənt/</span><div class="term-def">RL 环境：可让模型反复尝试、并给出可靠奖励的任务场景</div></div>
+      <div class="term"><span class="term-word">wedge</span><span class="term-ipa">/wɛdʒ/</span><div class="term-def">楔子：创业切入市场的第一个突破口</div></div>
+    </div>
+  </div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      On the flip side, what still feels automatable only from a distance? What domains or professions are safer than others?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      反过来说，哪些还只是「远远看着像能自动化」？哪些领域或职业比其他的更安全一些？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>Ultimately, almost everything can be made verifiable to some extent — some things more easily than others. Even for writing, you can imagine a council of LLM judges producing something reasonable. So it's more about what is easy or hard, rather than possible or impossible.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>归根结底，几乎一切都能在某种程度上被做成可验证的——只是有的容易、有的难。就算是写作，你也能想象用一个「LLM 评审委员会」得出还算合理的评判。所以问题更多是「容易还是难」，而不是「可能还是不可能」。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">council of LLM judges</span><span class="term-ipa">/ˈkaʊnsəl/</span><div class="term-def">LLM 评审团：用多个模型交叉打分来近似「验证」主观任务</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIBE vs AGENTIC ═══ -->
+<div class="section-block" id="s-vibe">
+  <div class="section-title"><span class="section-num">06</span> Vibe Coding vs. Agentic Engineering · 氛围编程 vs 代理工程</div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      Last year you coined the term vibe coding. Today we are in a world that feels more serious, more agentic engineering. What is the difference between the two, and what would you call what we are in today?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      去年你造了「vibe coding」这个词。今天我们所处的世界感觉更严肃了，更像「代理工程」。这两者的区别是什么？你会怎么称呼我们现在所处的阶段？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Core Insight</span>
+      <span class="speaker">Andrej</span>
+      <span class="hl-insight">Vibe coding is about raising the floor</span> for everyone — everyone can vibe code anything, and that's amazing. Agentic engineering is about preserving the quality bar of professional software. You are not allowed to introduce vulnerabilities because of vibe coding; you're still responsible for your software. But can you go faster? Spoiler: you can. The question is how to do it properly.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      <span class="speaker">Andrej</span>
+      <span class="hl-insight">Vibe coding 是把地板抬高</span>——让所有人都能 vibe code 任何东西，这很了不起。而代理工程是要守住专业软件的质量底线。你不能因为 vibe coding 就引入漏洞；你对你的软件仍然负责。但你能更快吗？剧透：能。问题是如何正确地做到。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">raise the floor</span><span class="term-ipa">/reɪz ðə flɔːr/</span><div class="term-def">抬高地板：提升最低能力线，让更多人能参与</div></div>
+      <div class="term"><span class="term-word">quality bar</span><span class="term-ipa">/ˈkwɒlɪti bɑːr/</span><div class="term-def">质量底线：不可退让的最低质量标准</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>I call it agentic engineering because it is an engineering discipline. You have agents, which are spiky entities — fallible and stochastic, but extremely powerful. How do you coordinate them to go faster without sacrificing your quality bar? They design specs, supervise plans, inspect diffs, write tests, create evaluation loops, manage permissions, and isolate worktrees.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>我称它为「代理工程」，因为它是一门工程学科。你手里有 Agent，它们是「尖刺状」的存在——会犯错、随机，但极其强大。你如何协调它们、在不牺牲质量底线的前提下更快？做法是：设计规格、监督计划、检查 diff、写测试、创建评估循环、管理权限、隔离 worktree。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">fallible</span><span class="term-ipa">/ˈfælɪbl/</span><div class="term-def">易错的：可能犯错的，非确定性的</div></div>
+      <div class="term"><span class="term-word">stochastic</span><span class="term-ipa">/stəˈkæstɪk/</span><div class="term-def">随机的：输出非确定，同一输入可能产生不同结果</div></div>
+      <div class="term"><span class="term-word">worktree</span><span class="term-ipa">/ˈwɜːrktriː/</span><div class="term-def">工作树：Git 中隔离的工作目录，Agent 可独立操作</div></div>
+    </div>
+  </div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Core Insight</span>
+      Vibe coding raises the floor. <span class="hl-insight">Agentic engineering is about extrapolating the ceiling</span>, and I think there is a very high ceiling on it. People used to talk about the 10x engineer. This is magnified a lot more — people who are very good at this can peak <span class="hl-insight">much higher than 10x</span>.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      Vibe coding 抬高地板。<span class="hl-insight">代理工程则是在外推天花板</span>，而我认为它的天花板非常高。人们过去谈「10 倍工程师」。这件事的放大倍数要大得多——真正擅长的人，峰值可以<span class="hl-insight">远高于 10 倍</span>。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">raise the ceiling</span><span class="term-ipa">/reɪz ðə ˈsiːlɪŋ/</span><div class="term-def">抬高天花板：提升能力上限，顶尖者可达更高</div></div>
+      <div class="term"><span class="term-word">10x engineer</span><span class="term-ipa">/ten ɛks ˈɛndʒɪnɪər/</span><div class="term-def">10 倍工程师：产出远超平均水平的顶尖开发者</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AI-NATIVE CODING ═══ -->
+<div class="section-block" id="s-native">
+  <div class="section-title"><span class="section-num">07</span> What AI-Native Coding Looks Like · AI 原生编码是什么样</div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      Last year Sam Altman said generations use ChatGPT differently — in your 30s it's a Google replacement, in your teens it's your gateway to the internet. What's the parallel in coding? If we watched two people code with OpenClaw, Claude Code, or Codex — one mediocre and one fully AI-native — how would you describe the difference?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      去年 Sam Altman 说，不同世代用 ChatGPT 的方式不同——三十多岁的人把它当 Google 替代品，青少年则把它当上网的入口。在编程里对应的是什么？如果我们看两个人用 OpenClaw、Claude Code 或 Codex 写代码——一个平庸，一个完全 AI 原生——你会怎么描述这两者的差别？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>It is about getting the most out of the tools available, using their features, and investing in your own setup. Engineers have always done this — with Vim or VS Code. Now the tools are Claude Code, Codex, and so on. You invest in your setup and use what's available.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>关键在于把手头工具用到极致、善用它们的功能、并在自己的「配置/工作台」上投入。工程师一直都在这么做——用 Vim 或 VS Code。现在工具换成了 Claude Code、Codex 等等。你投入自己的 setup，用好现有的一切。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">setup</span><span class="term-ipa">/ˈsɛtʌp/</span><div class="term-def">配置/工作台：个人化的工具链与开发环境</div></div>
+    </div>
+  </div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Core Insight · Hiring</span>
+      <span class="speaker">Andrej</span>
+      One related thought is hiring. Most hiring hasn't been refactored for agentic-engineer capability. If you're giving out small puzzles, that's the old paradigm. Hiring should look more like: <span class="hl-insight">give someone a big project — write a Twitter clone for agents, make it good and secure — then I'll use ten Codex agents to try to break the website you deployed, and they should not be able to.</span> Watching people build a bigger project with the tooling is closer to what I'd look for.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见 · 招聘</span>
+      <span class="speaker">Andrej</span>
+      一个相关的想法是招聘。大多数招聘流程还没有为「代理工程能力」重构。如果你还在出小谜题，那是旧范式。招聘更应该像这样：<span class="hl-insight">给一个大项目——为 Agent 写一个 Twitter 克隆，把它做好、做安全——然后我会用十个 Codex agent 去尝试攻破你部署的网站，而它们应该攻不破。</span>观察人们用工具去建一个更大的项目，更接近我想考察的东西。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">adversarial</span><span class="term-ipa">/ˌædvərˈseəriəl/</span><div class="term-def">对抗性的：专门寻找漏洞和弱点的</div></div>
+      <div class="term"><span class="term-word">clone</span><span class="term-ipa">/kloʊn/</span><div class="term-def">克隆：功能对标某产品的仿制实现</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HUMAN SKILLS ═══ -->
+<div class="section-block" id="s-human">
+  <div class="section-title"><span class="section-num">08</span> What Human Skills Become More Valuable · 哪些人类技能更值钱</div>
+
+  <div class="row question takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge hook">★ Rushen's Take-Away 3</span><span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      As agents do more, what human skill becomes more valuable, not less?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      随着 Agent 做得越来越多，哪种人类技能会变得更值钱、而不是更不值钱？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row takeaway">
+    <div class="cell en"><span class="takeaway-badge">★ Rushen's Take-Away 3</span><span class="speaker">Andrej</span>Right now the agents are like interns. You still have to be in charge of <span class="hl-insight">aesthetics, judgment, taste, and oversight</span>.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>现在的 Agent 就像实习生。你仍然得负责<span class="hl-insight">审美、判断、品味和监督</span>。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">oversight</span><span class="term-ipa">/ˈoʊvərsaɪt/</span><div class="term-def">监督：对产出把关、纠偏的责任</div></div>
+      <div class="term"><span class="term-word">taste</span><span class="term-ipa">/teɪst/</span><div class="term-def">品味：判断什么是好设计/好方案的直觉</div></div>
+    </div>
+  </div>
+
+  <div class="row contrast">
+    <div class="cell en">
+      <span class="insight-tag core">Real Bug Example</span>
+      A favorite example from MenuGen: you sign up with a Google account, but purchase credits via Stripe. Both have email addresses. My agent tried to assign purchased credits by <span class="hl-danger">matching the Stripe email to the Google email</span>. But those can differ — the user might not get their credits. Why cross-correlate funds by email? You need a <strong>persistent user ID</strong>. This is the kind of mistake agents still make.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">真实 Bug 案例</span>
+      MenuGen 里我很喜欢的一个例子：你用 Google 账号注册，但用 Stripe 购买额度。两边都有邮箱地址。我的 Agent 试图<span class="hl-danger">用 Stripe 邮箱去匹配 Google 邮箱</span>来分配购买的额度。但这两个邮箱可能不同——用户可能拿不到他买的额度。为什么要用邮箱来交叉关联资金？你需要一个<strong>持久用户 ID</strong>。这正是 Agent 目前仍会犯的错。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">plausible</span><span class="term-ipa">/ˈplɔːzəbl/</span><div class="term-def">看似合理的：表面逻辑通顺但可能遗漏关键约束</div></div>
+      <div class="term"><span class="term-word">persistent user ID</span><span class="term-ipa">/pərˈsɪstənt/</span><div class="term-def">持久用户 ID：跨系统稳定标识用户的主键，不应用邮箱替代</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>People have to be in charge of the spec and plan. I don't even fully like "plan mode" as a concept, though it's useful. There's something more general: you work with your agent to design a detailed spec — maybe basically the docs — and get agents to write them. You are in charge of oversight and the top-level categories; the agents do much of the work underneath.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>人必须掌控规格和计划。我其实并不完全喜欢「plan mode」这个概念，尽管它有用。有一种更普遍的东西：你和 Agent 一起设计一份详细的规格——差不多就是文档本身——再让 Agent 去写。你负责监督和顶层分类；底下大量的活由 Agent 来做。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">spec</span><span class="term-ipa">/spɛk/</span><div class="term-def">规格：对要做什么、约束是什么的精确描述</div></div>
+      <div class="term"><span class="term-word">plan mode</span><span class="term-ipa">/plæn moʊd/</span><div class="term-def">计划模式：Agent 先出计划、经确认再执行的工作模式</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>With tensors, there are many details across PyTorch, NumPy, pandas: dim vs axis, reshape, permute, transpose, keepdim. I don't remember this anymore because I don't have to — the intern handles it, agents have good recall. But you still have to understand the fundamentals: there's underlying tensor storage, you can manipulate a view of the same storage or create new storage, and you need to know enough to avoid copying memory unnecessarily.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>以张量为例，PyTorch、NumPy、pandas 里有一堆细节：dim 还是 axis、reshape、permute、transpose、keepdim。我已经不记这些了，因为我不需要——「实习生」会处理，Agent 记性很好。但你仍必须理解底层原理：存在底层的张量存储，你可以操纵同一份存储的一个「视图」，或者新建存储（那样更低效），你得懂到足以避免不必要的内存拷贝。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">tensor</span><span class="term-ipa">/ˈtensər/</span><div class="term-def">张量：多维数组，深度学习的基本数据结构</div></div>
+      <div class="term"><span class="term-word">view</span><span class="term-ipa">/vjuː/</span><div class="term-def">视图：共享底层存储的不同形状「看」法，无内存拷贝</div></div>
+    </div>
+  </div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      Do you think taste and judgment matter less over time, or does the ceiling just keep rising?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      你觉得随着时间推移，品味和判断会越来越不重要，还是天花板会一直往上抬？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row takeaway">
+    <div class="cell en"><span class="takeaway-badge">★ Rushen's Take-Away 3</span><span class="speaker">Andrej</span>I hope it improves. The reason it doesn't right now is probably that <span class="hl-insight">it's not part of the reinforcement learning</span> — there may be no aesthetics reward, or it's not good enough. When I look at the code, sometimes I get a heart attack. It can be bloated, copy-pasted, awkwardly abstracted, brittle. It works, but it's gross. I hope this improves.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>我希望会变好。它现在没变好，原因大概是<span class="hl-insight">这部分不在强化学习里</span>——可能没有「审美奖励」，或者奖励不够好。我看代码的时候，有时会心脏病发作。它可能臃肿、复制粘贴、抽象得别扭、脆弱。它能跑，但很难看。我希望这个会改善。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">bloated</span><span class="term-ipa">/ˈbloʊtɪd/</span><div class="term-def">臃肿的：冗长、含大量不必要内容的</div></div>
+      <div class="term"><span class="term-word">abstraction</span><span class="term-ipa">/æbˈstrækʃən/</span><div class="term-def">抽象：把重复逻辑提炼为通用结构；抽象得当与否很考验品味</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>A good example is my microGPT project, where I tried to simplify LLM training as much as possible. The models hate this. They can't do it. I kept prompting an LLM to simplify more and more, and it just couldn't. You feel like you're outside the RL circuits — it's like pulling teeth. So people remain in charge of this for now, but I don't think anything fundamental prevents improvement. The labs just haven't done it yet.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>一个好例子是我的 microGPT 项目，我试图把 LLM 训练尽可能简化。模型讨厌这件事。它们做不到。我不停提示 LLM「再简化、再简化」，它就是做不到。你会感觉自己在 RL 的电路之外——像拔牙一样费劲。所以这部分暂时仍由人来掌控，但我不认为有什么根本性的东西阻止它变好。只是实验室还没去做而已。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">microGPT</span><span class="term-ipa">/ˈmaɪkroʊ dʒiː piː tiː/</span><div class="term-def">Karpathy 的单文件 GPT 教学实现，追求极简、可 inspect</div></div>
+      <div class="term"><span class="term-word">pulling teeth</span><span class="term-ipa">/ˈpʊlɪŋ tiːθ/</span><div class="term-def">像拔牙：形容极其吃力、勉强的过程</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GHOSTS ═══ -->
+<div class="section-block" id="s-ghost">
+  <div class="section-title"><span class="section-num">09</span> Ghosts, Not Animals · 幽灵，而非动物</div>
+
+  <div class="row question takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge hook">★ Rushen's Take-Away 4</span><span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      You wrote a thought-provoking piece on Animals vs. Ghosts: we're not building animals, we're summoning ghosts — jagged forms of intelligence shaped by data and reward functions, not by intrinsic motivation, fun, curiosity, or empowerment the way evolution shaped animals. Why does that framing matter? What does it change about how you build, deploy, evaluate, or trust them?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      你写过一篇发人深省的文章《动物 vs 幽灵》：我们不是在造动物，而是在召唤幽灵——由数据和奖励函数塑造的锯齿状智能，而非像进化塑造动物那样由内在动机、乐趣、好奇心或自我赋能塑造。为什么这个框架重要？它改变了你构建、部署、评估或信任它们的方式吗？
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">summon</span><span class="term-ipa">/ˈsʌmən/</span><div class="term-def">召唤：此处喻指「唤出」一种非生物的智能</div></div>
+    </div>
+  </div>
+
+  <div class="row insight takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge">★ Rushen's Take-Away 4</span><span class="insight-tag core">Core Insight</span>
+      <span class="speaker">Andrej</span>
+      I wrote it to wrap my head around what these things are. If you have a good model of what they are and are not, you'll be more competent using them. <span class="hl-insight">LLMs are not animals.</span> They don't have biological drives, embodied survival pressure, curiosity, or intrinsic motivation in the animal sense. They are <span class="hl-insight">statistical simulations of human artifacts</span> — the substrate is pretraining, then reinforcement learning bolted on top.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      <span class="speaker">Andrej</span>
+      我写它是为了搞清楚这些东西到底是什么。如果你对「它们是什么、不是什么」有个好模型，你用起来就更在行。<span class="hl-insight">LLM 不是动物。</span>它们没有生物驱动、没有具身的生存压力、没有动物意义上的好奇心或内在动机。它们是<span class="hl-insight">对人类文物的统计模拟</span>——底层是预训练，然后在其上「拴」了强化学习。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">anthropomorphic</span><span class="term-ipa">/ˌænθrəpəˈmɔːrfɪk/</span><div class="term-def">拟人化的：把人类特质错误投射到 AI 上</div></div>
+      <div class="term"><span class="term-word">intrinsic motivation</span><span class="term-ipa">/ɪnˈtrɪnsɪk ˌmoʊtɪˈveɪʃən/</span><div class="term-def">内在动机：源自自身而非外部奖励的驱动力</div></div>
+      <div class="term"><span class="term-word">substrate</span><span class="term-ipa">/ˈsʌbstreɪt/</span><div class="term-def">基底：底层承载物；此处指预训练是能力的基底</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>It's a little philosophical, but it's about coming to terms with the fact that these are not animal intelligence. If you yell at them, they won't work better or worse — they're statistical simulation circuits. It's a mindset: what am I interacting with, what's likely to work, what's not, and how do I modify it? It's more about being suspicious of the system and figuring it out empirically over time.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>这有点哲学，但核心是接受一个事实：这些不是动物智能。你冲它们吼，它们不会因此做得更好或更差——它们是统计模拟的电路。这是一种心态：我在和什么打交道、什么大概会奏效、什么不会、我该如何调整？它更多是对系统保持怀疑，随时间在经验中把它摸清楚。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">empirical</span><span class="term-ipa">/ɪmˈpɪrɪkl/</span><div class="term-def">经验性的：通过实际测试而非理论推断来了解</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AGENT-NATIVE INFRA ═══ -->
+<div class="section-block" id="s-infra">
+  <div class="section-title"><span class="section-num">10</span> Agent-Native Infrastructure · Agent 原生基础设施</div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      You're deep in working with agents that don't just chat — they have real permissions, local context, and take action on your behalf. What does the world look like when we all live in that world?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      你深入在和这样的 Agent 打交道：它们不只是聊天，还有真实的权限、本地上下文，能代表你采取行动。当我们都生活在那样的世界里时，世界会是什么样子？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Core Insight</span>
+      <span class="speaker">Andrej</span>
+      <span class="hl-insight">Everything has to be rewritten. Most things are still fundamentally written for humans.</span> When I use frameworks or libraries, the docs are still written for humans — my favorite pet peeve. Every time I'm told "go to this URL" or "click here," I think: no. <span class="hl-insight">The user is increasingly the human's agent, not the human directly.</span>
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      <span class="speaker">Andrej</span>
+      <span class="hl-insight">一切都得重写。大多数东西在根本上仍是为人类而写的。</span>我用框架或库时，文档还是写给人看的——这是我最爱吐槽的点。每次被告知「去这个 URL」或「点这里」，我就想：不。<span class="hl-insight">用户越来越是「人类的 Agent」，而不是人类本人。</span>
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">agent-native</span><span class="term-ipa">/ˈeɪdʒənt ˈneɪtɪv/</span><div class="term-def">Agent 原生的：优先为 AI Agent 而非人类 UI 设计的</div></div>
+      <div class="term"><span class="term-word">pet peeve</span><span class="term-ipa">/pɛt piːv/</span><div class="term-def">最爱吐槽的小事：让人特别恼火的常见现象</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>The industry has to decompose workloads into <strong>sensors and actuators</strong> over the world. A sensor turns some state of the world into digital information; an actuator lets an agent change something. How do we describe things to agents first, and build automation around data structures legible to LLMs? Products need agent-native surfaces: Markdown docs, CLIs, APIs, MCP servers, structured logs, machine-readable schemas, copy-pasteable instructions, safe permissioning, auditable actions, headless setup flows.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>行业必须把工作负载分解成面向世界的<strong>传感器和致动器</strong>。传感器把世界的某种状态转成数字信息；致动器让 Agent 去改变某物。我们如何「先向 Agent 描述」、并围绕对 LLM 可读的数据结构去构建自动化？产品需要 Agent 原生的接口：Markdown 文档、CLI、API、MCP 服务器、结构化日志、机器可读 schema、可粘贴的指令、安全权限、可审计操作、无头安装流程。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">sensor</span><span class="term-ipa">/ˈsensər/</span><div class="term-def">传感器：读取/感知外部状态的接口（API、日志、CLI 输出等）</div></div>
+      <div class="term"><span class="term-word">actuator</span><span class="term-ipa">/ˈæktʃueɪtər/</span><div class="term-def">致动器：执行/改变外部状态的接口（写 API、部署、发消息等）</div></div>
+      <div class="term"><span class="term-word">MCP</span><span class="term-ipa">/ɛm siː piː/</span><div class="term-def">Model Context Protocol，模型上下文协议：Agent 连接外部工具的标准</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>With MenuGen, the hard part wasn't writing the code — it was deploying on Vercel, wiring services, settings, DNS, auth, payments, secrets, and production config. I'd hope I could prompt an LLM "build MenuGen," not touch anything, and have it deployed on the internet. That would be a good test of whether our infrastructure is agent-native. Ultimately, people and organizations will have agent representation — my agent will talk to your agent to figure out meeting details and other tasks.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>MenuGen 里最难的不是写代码——而是部署到 Vercel、接各种服务、配置、DNS、认证、支付、密钥和生产配置。我希望能对 LLM 说一句「build MenuGen」，然后我什么都不碰，它就部署到了互联网上。那会是一个很好的检验：我们的基础设施是否已经 Agent 原生。最终，人和组织都会拥有「Agent 代表」——我的 Agent 会和你的 Agent 对话，去敲定会议细节和其他事务。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">headless</span><span class="term-ipa">/ˈhedləs/</span><div class="term-def">无头的：无需 GUI 交互、纯 API/CLI 驱动的</div></div>
+      <div class="term"><span class="term-word">agent representation</span><span class="term-ipa">/ˌrɛprɪzɛnˈteɪʃən/</span><div class="term-def">Agent 代表：人/组织派出的、代其行动与协商的 AI 代理</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EDUCATION ═══ -->
+<div class="section-block" id="s-edu">
+  <div class="section-title"><span class="section-num">11</span> Education and Understanding · 教育与理解</div>
+
+  <div class="row question takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge hook">★ Rushen's Take-Away 5</span><span class="q-tag">Question</span>
+      <span class="speaker">Stephanie Zhan</span>
+      We have to end on education. You're one of the best in the world at making complex technical concepts simple, and you think deeply about education. What remains worth learning deeply when intelligence gets cheap?
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">提问</span>
+      <span class="speaker">Stephanie Zhan</span>
+      我们必须以教育收尾。你是世界上最擅长把复杂技术概念讲简单的人之一，也对教育有很深的思考。当智能变得廉价，什么仍然值得去深入学习？
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row quote takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge">★ Rushen's Take-Away 5</span><span class="insight-tag quote">Memorable Quote</span>
+      <span class="speaker">Andrej</span>
+      There was a tweet that blew my mind recently, and I keep thinking about it:
+      <span style="font-family:'Source Serif 4',serif;font-size:1.15rem;font-style:italic;color:var(--quote);display:block;margin-top:0.4rem;">
+        "You can outsource your thinking, but you can't outsource your understanding."
+      </span>
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag quote">金句</span>
+      <span class="speaker">Andrej</span>
+      最近有一条推文让我震撼，我一直在想它：
+      <span style="font-size:1.05rem;font-style:italic;color:var(--quote);display:block;margin-top:0.4rem;">
+        「你可以外包你的思考，但你不能外包你的理解。」
+      </span>
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">outsource</span><span class="term-ipa">/ˈaʊtsɔːrs/</span><div class="term-def">外包：将任务委托给外部（此处指交给 AI）</div></div>
+    </div>
+  </div>
+
+  <div class="row insight takeaway">
+    <div class="cell en">
+      <span class="takeaway-badge">★ Rushen's Take-Away 5</span><span class="insight-tag core">Core Insight</span>
+      That's nicely put. I'm still part of the system — information still has to make it into my brain. I'm becoming the bottleneck of even knowing what we're trying to build, why it's worth doing, and how to direct my agents. <span class="hl-insight">Something still has to direct the thinking, and that is constrained by understanding. Understanding is still the bottleneck</span> — you can't be a good director if you don't understand.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">核心洞见</span>
+      说得真好。我仍然是系统的一部分——信息还是得进到我的脑子里。我正在成为瓶颈：连「我们到底想造什么、为什么值得做、如何指挥我的 Agent」这些都要靠我。<span class="hl-insight">总得有东西来主导思考，而这受制于理解。理解仍然是瓶颈</span>——如果你不理解，就当不好那个「导演」。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">bottleneck</span><span class="term-ipa">/ˈbɒtlnek/</span><div class="term-def">瓶颈：限制整体速度的关键约束环节</div></div>
+      <div class="term"><span class="term-word">director</span><span class="term-ipa">/dɪˈrɛktər/</span><div class="term-def">导演/指挥者：定方向、把关全局的角色</div></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>This is one reason I'm excited about LLM knowledge bases — they're a way to process information. Whenever I see a different projection onto information, I feel like I gain insight; it's synthetic data generation over fixed data. When I read an article, my wiki is built up from those articles, and I love asking questions about it. These are tools to enhance understanding. LLMs don't fully excel at understanding — you're still uniquely in charge of that. This also connects to microGPT: the educational artifact becomes small enough for both humans and agents to inspect. The human contributes the distilled artifact and the taste behind it; the agent explains it interactively to each learner.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>这也是我对 LLM 知识库兴奋的原因之一——它们是我处理信息的一种方式。每当我看到对信息的一种不同「投影」，就感觉获得了洞察；这是在固定数据上做合成数据生成。当我读一篇文章，我的 wiki 会从这些文章里不断累积，我很喜欢就它提问。这些都是增强理解的工具。LLM 在「理解」上并不完全出色——这件事仍然由你独一无二地负责。这也关联到 microGPT：教育产物变得小到人类和 Agent 都能 inspect。人类贡献那份精炼的产物以及背后的品味；Agent 再交互式地讲给每个学习者听。</div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">projection</span><span class="term-ipa">/prəˈdʒɛkʃən/</span><div class="term-def">投影：对同一信息换一个角度的呈现，常带来新洞察</div></div>
+      <div class="term"><span class="term-word">synthesis</span><span class="term-ipa">/ˈsɪnθəsɪs/</span><div class="term-def">综合：将多源信息融合为新见解的过程</div></div>
+    </div>
+  </div>
+
+  <div class="row question">
+    <div class="cell en">
+      <span class="q-tag">Closing</span>
+      <span class="speaker">Stephanie Zhan</span>
+      I'm excited to come back here in a couple of years and see if we've been fully automated out of the loop — and whether they take care of understanding as well. Thank you so much, Andrej.
+    </div>
+    <div class="cell zh">
+      <span class="q-tag">收尾</span>
+      <span class="speaker">Stephanie Zhan</span>
+      我很期待几年后再回到这里，看看我们是不是已经被完全自动化、挤出了回路——以及它们是否也把「理解」这件事接管了。非常感谢你，Andrej。
+    </div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row">
+    <div class="cell en"><span class="speaker">Andrej</span>Thank you.</div>
+    <div class="cell zh"><span class="speaker">Andrej</span>谢谢。</div>
+    <div class="cell terms"></div>
+  </div>
+
+  <div class="row question">
+    <div class="cell en"><span class="q-tag">Host</span><span class="speaker">Konstantine</span>Stephanie, Andrej, thank you so much.</div>
+    <div class="cell zh"><span class="q-tag">主持</span><span class="speaker">Konstantine</span>Stephanie、Andrej，非常感谢。</div>
+    <div class="cell terms"></div>
+  </div>
+</div>
+
+<!-- ═══ BIG PICTURE ═══ -->
+<div class="section-block" id="s-big">
+  <div class="section-title"><span class="section-num">∑</span> The Big Picture · 全景总结</div>
+
+  <div class="row insight">
+    <div class="cell en">
+      <span class="insight-tag core">Final Thesis</span>
+      AI is becoming a <span class="hl-insight">new operating layer for digital work</span>. The scarce thing is shifting: less scarce — code generation, API recall, boilerplate, first drafts, repetitive setup. More scarce — understanding, taste, eval design, security, system boundaries, agent orchestration, domain-specific feedback loops, and knowing when the model is off the rails.
+    </div>
+    <div class="cell zh">
+      <span class="insight-tag core">最终论点</span>
+      AI 正在成为<span class="hl-insight">数字工作的新操作层</span>。稀缺物在转移：不再稀缺——代码生成、API 记忆、样板代码、初稿、重复性搭建。更加稀缺——理解、品味、评估设计、安全、系统边界、Agent 编排、领域特定反馈循环，以及「知道模型何时脱轨」。
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">boilerplate</span><span class="term-ipa">/ˈbɔɪlərpleɪt/</span><div class="term-def">样板代码：重复性、模板化的基础代码</div></div>
+      <div class="term"><span class="term-word">feedback loop</span><span class="term-ipa">/ˈfiːdbæk luːp/</span><div class="term-def">反馈循环：输出→评估→改进的闭环系统</div></div>
+    </div>
+  </div>
+
+  <div class="row paradigm">
+    <div class="cell en" style="grid-column: 1 / 3;">
+      <div class="formula">define the context
+define the tools
+define the feedback loop
+define the guardrails
+let agents work
+preserve human understanding</div>
+    </div>
+    <div class="cell terms">
+      <div class="term"><span class="term-word">guardrails</span><span class="term-ipa">/ˈɡɑːrdreɪlz/</span><div class="term-def">护栏：限制 Agent 行为边界的安全约束</div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  基于 <a href="https://karpathy.bearblog.dev/sequoia-ascent-2026/" target="_blank">Karpathy 官方清理稿</a>（完整对谈版）制作 ·
+  原视频 <a href="https://www.youtube.com/watch?v=96jN2OCOfLs" target="_blank">YouTube</a> ·
+  Sequoia Ascent 2026
+</footer>
+
+<script>
+  // Highlight active nav section on scroll
+  const sections = document.querySelectorAll('.section-block[id]');
+  const navLinks = document.querySelectorAll('.section-nav a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Click term to highlight in English column
+  document.querySelectorAll('.term-word').forEach(word => {
+    word.style.cursor = 'pointer';
+    word.addEventListener('click', () => {
+      const term = word.textContent.trim();
+      document.querySelectorAll('.cell.en').forEach(cell => {
+        cell.innerHTML = cell.innerHTML.replace(
+          new RegExp(`\\b(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\b`, 'gi'),
+          '<mark style="background:rgba(216,165,45,0.4);color:#6b4500;padding:0 2px;border-radius:2px;">$1</mark>'
+        );
+      });
+    });
+  });
+</script>
+
+<!-- In-browser edit toggle (Rushen) -->
+<button id="rs-edit-toggle" type="button" contenteditable="false">✏️ 编辑</button>
+<style>
+  #rs-edit-toggle{ position:fixed; right:18px; bottom:18px; z-index:99999;
+    font-family:'Noto Sans SC',system-ui,sans-serif; font-size:14px; font-weight:600;
+    padding:10px 16px; border-radius:999px; cursor:pointer; color:#fff;
+    background:#b85c3e; border:none; box-shadow:0 6px 20px rgba(184,92,62,0.35); }
+  #rs-edit-toggle.editing{ background:#2f7d32; box-shadow:0 6px 20px rgba(47,125,50,0.35); }
+  body[contenteditable="true"] .cell:hover,
+  body[contenteditable="true"] .thesis-card:hover,
+  body[contenteditable="true"] .cover__body:hover{ outline:1px dashed rgba(184,92,62,0.45); outline-offset:2px; }
+</style>
+<script>
+(function(){
+  var btn=document.getElementById('rs-edit-toggle');
+  if(!btn) return;
+  btn.addEventListener('click',function(){
+    var on=document.body.getAttribute('contenteditable')==='true';
+    document.body.setAttribute('contenteditable', on?'false':'true');
+    btn.classList.toggle('editing',!on);
+    btn.textContent=on?'✏️ 编辑':'✅ 完成 · ⌘S 存网页';
+  });
+})();
+</script>
+
+</body>
+</html>
